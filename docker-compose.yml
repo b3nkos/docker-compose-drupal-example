@@ -1,0 +1,46 @@
+version: "3.1"
+services:
+  nginx:
+    image: nginx:latest
+    working_dir: /var/www/html
+    volumes:
+      - ./project:/var/www/html
+      - ./docker/nginx/site.conf:/etc/nginx/conf.d/default.conf
+    ports:
+     - "80:80"
+    depends_on:
+      - php
+    environment:
+      - APP_ENV=local
+  php:
+    image: drupal:8.6.2-fpm
+    working_dir: /var/www/html
+    volumes:
+      - ./project:/var/www/html
+    depends_on:
+      - postgres
+      - mariadb
+    environment:
+      - APP_ENV=local
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data-volume:/var/lib/postgresql/data
+    environment:
+    - "POSTGRES_USER=mastering_drupal_8"
+    - "POSTGRES_PASSWORD=secret"
+  mariadb:
+    image: mariadb:10.1.26
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb-data-volume:/var/lib/mysql
+    environment:
+    - "MYSQL_USER=homestead"
+    - "MYSQL_PASSWORD=secret"
+    - "MYSQL_ROOT_PASSWORD=secret"
+volumes:
+  postgres-data-volume:
+  mariadb-data-volume:
